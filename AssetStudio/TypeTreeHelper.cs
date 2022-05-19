@@ -289,6 +289,15 @@ namespace AssetStudio
                             {
                                 var classmember = @class[j];
                                 var name = classmember.m_Name;
+                                // On Genshin TimelineClip class, some file have 0x10 blank 
+                                if (name == "m_DisplayName" && varTypeStr == "TimelineClip")
+                                {
+                                    var size = reader.ReadInt32();
+                                    if (size > 0)
+                                        reader.BaseStream.Position -= 4;
+                                    else
+                                        reader.ReadBytes(12);
+                                }
                                 obj[name] = ReadValue(@class, reader, ref j);
                             }
                             value = obj;
