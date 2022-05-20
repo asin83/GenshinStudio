@@ -263,7 +263,10 @@ namespace Unity.SerializationLogic
                 if (!HasSerializeReferenceAttribute(fieldDefinition))
                     return IsSupportedCollection(typeReference);
             }
-
+            
+            var typeDef = typeReference.CheckedResolve();
+            if (typeDef.IsValueType && typeDef.IsEnum())
+                return true;
 
             if (!IsReferenceTypeSerializable(typeReference) && !HasSerializeReferenceAttribute(fieldDefinition))
                 return false;
