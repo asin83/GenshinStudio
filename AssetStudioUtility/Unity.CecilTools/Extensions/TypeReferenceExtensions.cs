@@ -37,12 +37,14 @@ namespace Unity.CecilTools.Extensions
 
         public static bool IsEnum(this TypeReference type)
         {
-            return type.IsValueType && !type.IsPrimitive && type.CheckedResolve().IsEnum;
+            var resolved = type.CheckedResolve();
+            return resolved.IsValueType && !type.IsPrimitive && resolved.IsEnum;
         }
 
         public static bool IsStruct(this TypeReference type)
         {
-            return type.IsValueType && !type.IsPrimitive && !type.IsEnum() && !IsSystemDecimal(type);
+            var resolved = type.CheckedResolve();
+            return resolved.IsValueType && !type.IsPrimitive && !type.IsEnum() && !IsSystemDecimal(type);
         }
 
         private static bool IsSystemDecimal(TypeReference type)

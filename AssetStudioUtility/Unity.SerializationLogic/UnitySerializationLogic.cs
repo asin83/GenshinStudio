@@ -230,6 +230,8 @@ namespace Unity.SerializationLogic
             //skip static, const and NotSerialized fields before even checking the type
             if (fieldDefinition.IsStatic || IsConst(fieldDefinition) || fieldDefinition.IsNotSerialized || fieldDefinition.IsInitOnly)
                 return false;
+            if (ContainNotSerializedAttribute(fieldDefinition))
+                return false;
 
             // The field must have correct visibility/decoration to be serialized.
             if (!fieldDefinition.IsPublic &&
@@ -256,25 +258,42 @@ namespace Unity.SerializationLogic
                 return true;
 
             if (typeReference.IsValueType)
-                return IsValueTypeSerializable(typeReference);
+                return IsValueTypeSerializable(typeReference) || HasSerializeAttribute(typeReference) || IsContainClassSerializable(fieldDefinition);
 
             if (typeReference is ArrayType || CecilUtils.IsGenericList(typeReference))
             {
                 if (!HasSerializeReferenceAttribute(fieldDefinition))
-                    return IsSupportedCollection(typeReference);
+                    return IsSupportedCollection(typeReference) || HasSerializeAttribute(typeReference) || IsContainClassSerializable(fieldDefinition);;
             }
-            
-            var typeDef = typeReference.CheckedResolve();
-            if (typeDef.IsValueType && typeDef.IsEnum())
-                return true;
 
-            if (!IsReferenceTypeSerializable(typeReference) && !HasSerializeReferenceAttribute(fieldDefinition))
+            if (!IsReferenceTypeSerializable(typeReference) && !HasSerializeReferenceAttribute(fieldDefinition)&&
+                !HasSerializeAttribute(typeReference) && !IsContainClassSerializable(fieldDefinition))
+            {
                 return false;
+            }
 
             if (IsDelegate(typeReference))
                 return false;
-
+            
             return true;
+        }
+
+        private static bool ContainNotSerializedAttribute(FieldDefinition fieldDefinition)
+        {
+            foreach (var customAttribute in fieldDefinition.CustomAttributes)
+                if (customAttribute.AttributeType.FullName == "FullInspector.NotSerializedAttribute")
+                    return true;
+            return false;
+        }
+
+        private static bool IsContainClassSerializable(FieldDefinition fieldDefinition)
+        {
+            return (fieldDefinition.DeclaringType.Resolve().Attributes & TypeAttributes.Serializable) != 0;
+        }
+
+        private static bool HasSerializeAttribute(TypeReference typeReference)
+        {
+            return (typeReference.CheckedResolve().Attributes & TypeAttributes.Serializable) != 0;
         }
 
         private static bool IsDelegate(TypeReference typeReference)
