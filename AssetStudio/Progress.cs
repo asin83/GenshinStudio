@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace AssetStudio
 {
     public static class Progress

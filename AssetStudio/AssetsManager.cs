@@ -561,7 +561,7 @@ namespace AssetStudio
                         }
                     }
                     else if (obj is SpriteAtlas m_SpriteAtlas)
-                    {   
+                    {
                         foreach (var m_PackedSprite in m_SpriteAtlas.m_PackedSprites)
                         {
                             if (m_PackedSprite.TryGet(out var m_Sprite))

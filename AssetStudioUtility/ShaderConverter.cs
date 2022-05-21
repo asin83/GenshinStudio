@@ -884,17 +884,7 @@ namespace AssetStudio
             }
             m_SubPrograms = new ShaderSubProgram[subProgramsCapacity];
         }
-
-        public string Export(string shader)
-        {
-            var evaluator = new MatchEvaluator(match =>
-            {
-                var index = int.Parse(match.Groups[1].Value);
-                return m_SubPrograms[index].Export();
-            });
-            shader = Regex.Replace(shader, "GpuProgramIndex (.+)", evaluator);
-            return shader;
-        }
+        
         public void Read(EndianBinaryReader reader, int segment)
         {
             for (int i = 0; i < entries.Length; i++)
@@ -907,6 +897,18 @@ namespace AssetStudio
                 }
             }
         }
+
+        public string Export(string shader)
+        {
+            var evaluator = new MatchEvaluator(match =>
+            {
+                var index = int.Parse(match.Groups[1].Value);
+                return m_SubPrograms[index].Export();
+            });
+            shader = Regex.Replace(shader, "GpuProgramIndex (.+)", evaluator);
+            return shader;
+        }
+        
     }
 
     public class ShaderSubProgram
