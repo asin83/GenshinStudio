@@ -130,7 +130,7 @@ namespace AssetStudio
 
         private static bool IsStruct(TypeReference typeRef)
         {
-            return typeRef.Resolve().IsValueType && !IsEnum(typeRef) && !typeRef.IsPrimitive;
+            return typeRef.IsValueType && !IsEnum(typeRef) && !typeRef.IsPrimitive;
         }
 
         private static bool IsEnum(TypeReference typeRef)

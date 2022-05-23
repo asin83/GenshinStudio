@@ -256,7 +256,7 @@ namespace Unity.SerializationLogic
                 return true;
 
             if (typeReference.IsValueType)
-                return IsValueTypeSerializable(typeReference) || HasSerializeAttribute(typeReference) || IsContainClassSerializable(fieldDefinition);
+                return IsValueTypeSerializable(typeReference);
 
             if (typeReference is ArrayType || CecilUtils.IsGenericList(typeReference))
             {
@@ -264,25 +264,14 @@ namespace Unity.SerializationLogic
                     return IsSupportedCollection(typeReference);
             }
 
-            if (!IsReferenceTypeSerializable(typeReference) && !HasSerializeReferenceAttribute(fieldDefinition)&&
-                !HasSerializeAttribute(typeReference) && !IsContainClassSerializable(fieldDefinition))
-            {
+
+            if (!IsReferenceTypeSerializable(typeReference) && !HasSerializeReferenceAttribute(fieldDefinition))
                 return false;
-            }
 
             if (IsDelegate(typeReference))
                 return false;
-            
-            return true;
-        }
-        private static bool IsContainClassSerializable(FieldDefinition fieldDefinition)
-        {
-            return (fieldDefinition.DeclaringType.Resolve().Attributes & TypeAttributes.Serializable) != 0;
-        }
 
-        private static bool HasSerializeAttribute(TypeReference typeReference)
-        {
-            return (typeReference.CheckedResolve().Attributes & TypeAttributes.Serializable) != 0;
+            return true;
         }
 
         private static bool IsDelegate(TypeReference typeReference)
